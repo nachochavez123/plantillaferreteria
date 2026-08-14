@@ -2,7 +2,7 @@
 <html lang="es" class="light">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Ferretería Industrial Santa Cruz - Equipamos a los Profesionales del Sur</title>
   
   <!-- Google Fonts & Material Symbols -->
@@ -58,26 +58,31 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Smooth transitions for theme & view switches */
+    /* Touch optimization for mobile responsiveness */
+    button, a, select, input {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
       transition: background-color 0.3s ease, color 0.3s ease;
+      overscroll-behavior-y: none;
     }
   </style>
 </head>
-<body class="bg-[#f6fafe] dark:bg-[#051424] text-[#171c1f] dark:text-[#edf1f5] font-sans antialiased min-h-screen flex flex-col pb-16 md:pb-0">
+<body class="bg-[#f6fafe] dark:bg-[#051424] text-[#171c1f] dark:text-[#edf1f5] font-sans antialiased min-h-screen flex flex-col pb-20 md:pb-0">
 
   <!-- TOP HEADER -->
   <header class="bg-[#0f172a] dark:bg-[#09101d] text-white sticky top-0 z-40 w-full shadow-md">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2 md:gap-4">
       
       <!-- Brand Logo & Title -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('inicio')">
-        <div class="w-10 h-10 bg-[#f97316] rounded-lg flex items-center justify-center font-extrabold text-xl text-white shadow-inner">
+      <div class="flex items-center gap-2 md:gap-3 cursor-pointer" onclick="navigateTo('inicio')">
+        <div class="w-9 h-9 md:w-10 md:h-10 bg-[#f97316] rounded-lg flex items-center justify-center font-extrabold text-lg md:text-xl text-white shadow-inner shrink-0">
           SC
         </div>
         <div>
-          <h1 class="text-base md:text-lg font-bold leading-tight tracking-tight">Ferretería Santa Cruz</h1>
-          <p class="text-[10px] text-gray-300 font-mono tracking-wider uppercase">Patagonia Industrial</p>
+          <h1 class="text-sm md:text-lg font-bold leading-tight tracking-tight">Ferretería Santa Cruz</h1>
+          <p class="text-[9px] md:text-[10px] text-gray-300 font-mono tracking-wider uppercase">Patagonia Industrial</p>
         </div>
       </div>
 
@@ -92,32 +97,32 @@
         </button>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-2 md:gap-4">
+      <!-- Action Buttons & Controls -->
+      <div class="flex items-center gap-1.5 md:gap-3">
         
-        <!-- Mode Badge Indicator -->
-        <div id="wholesaleHeaderBadge" class="hidden sm:flex items-center gap-1 bg-[#f97316]/20 border border-[#f97316]/40 text-[#f97316] px-2.5 py-1 rounded-full text-xs font-semibold">
+        <!-- Tariff Quick Switcher (Mobile & Desktop) -->
+        <button onclick="toggleTariffModeQuick()" id="headerTariffBtn" class="flex items-center gap-1 bg-[#f97316]/20 border border-[#f97316]/50 text-[#f97316] px-2.5 py-1 rounded-full text-[11px] font-bold transition-all active:scale-95">
           <span class="w-2 h-2 rounded-full bg-[#f97316] animate-pulse"></span>
           <span id="headerBadgeText">Minorista</span>
-        </div>
+        </button>
 
         <!-- Dark/Light Theme Toggle Button -->
-        <button onclick="toggleTheme()" class="p-2 text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Cambiar Tema (Claro/Oscuro)">
+        <button onclick="toggleTheme()" class="p-2 text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors active:scale-95" title="Cambiar Tema (Claro/Oscuro)">
           <span class="material-symbols-outlined dark:hidden">dark_mode</span>
           <span class="material-symbols-outlined hidden dark:block text-yellow-400">light_mode</span>
         </button>
 
         <!-- Cart Button -->
-        <button onclick="toggleCartDrawer()" class="relative p-2 text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Ver Carrito">
+        <button onclick="navigateTo('carrito')" class="relative p-2 text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors active:scale-95" title="Ver Carrito">
           <span class="material-symbols-outlined">shopping_cart</span>
           <span id="cartBadgeCount" class="absolute -top-1 -right-1 bg-[#f97316] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">
             0
           </span>
         </button>
 
-        <!-- Account Button -->
-        <button onclick="navigateTo('cuenta')" class="p-2 text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Mi Cuenta">
-          <span class="material-symbols-outlined">account_circle</span>
+        <!-- Mobile Drawer Toggle Button (Hamburger) -->
+        <button onclick="toggleMobileDrawer()" class="md:hidden p-2 text-gray-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors active:scale-95" title="Menú Principal">
+          <span class="material-symbols-outlined text-2xl">menu</span>
         </button>
       </div>
     </div>
@@ -126,12 +131,90 @@
     <div class="md:hidden px-4 pb-3">
       <div class="relative w-full">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-        <input type="text" oninput="handleHeaderSearch(this.value)"
-               placeholder="Buscar en el catálogo..." 
+        <input type="text" id="mobileHeaderSearch" oninput="handleHeaderSearch(this.value)"
+               placeholder="Buscar herramientas, materiales..." 
                class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 text-sm text-white rounded-lg focus:outline-none focus:border-[#f97316]">
       </div>
     </div>
   </header>
+
+  <!-- MOBILE SLIDE-OVER NAVIGATION DRAWER -->
+  <div id="mobileDrawer" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:hidden flex justify-end">
+    <div class="w-4/5 max-w-xs bg-white dark:bg-[#0d1c2e] h-full p-5 space-y-6 shadow-2xl overflow-y-auto flex flex-col justify-between border-l border-gray-200 dark:border-slate-800">
+      
+      <div class="space-y-6">
+        <!-- Header inside drawer -->
+        <div class="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-slate-800">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-[#f97316] rounded-lg flex items-center justify-center font-bold text-white text-sm">
+              SC
+            </div>
+            <div>
+              <h3 class="font-bold text-sm">Ferretería Santa Cruz</h3>
+              <p class="text-[10px] text-gray-400 font-mono">Menú Navegación</p>
+            </div>
+          </div>
+          <button onclick="toggleMobileDrawer()" class="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-white rounded-lg">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Tariff Mode Switcher Card inside Drawer -->
+        <div class="bg-gray-100 dark:bg-slate-800/80 p-2 rounded-xl border border-gray-200 dark:border-slate-700 space-y-2">
+          <p class="text-[11px] font-mono text-gray-500 dark:text-gray-400 px-1 uppercase font-semibold">Modo de Precios</p>
+          <div class="grid grid-cols-2 gap-1">
+            <button id="mBtnSideRetail" onclick="setTariffMode('retail'); toggleMobileDrawer();" class="py-2 px-2 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm">
+              Minorista
+            </button>
+            <button id="mBtnSideWholesale" onclick="setTariffMode('wholesale'); toggleMobileDrawer();" class="py-2 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400">
+              Mayorista
+            </button>
+          </div>
+        </div>
+
+        <!-- Links List -->
+        <nav class="space-y-1">
+          <button onclick="navigateTo('inicio'); toggleMobileDrawer();" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200">
+            <span class="material-symbols-outlined text-[#f97316]">home</span>
+            <span>Inicio</span>
+          </button>
+
+          <button onclick="navigateTo('catalogo'); toggleMobileDrawer();" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200">
+            <span class="material-symbols-outlined text-blue-500">storefront</span>
+            <span>Catálogo Completo</span>
+          </button>
+
+          <button onclick="navigateTo('categorias'); toggleMobileDrawer();" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200">
+            <span class="material-symbols-outlined text-yellow-500">category</span>
+            <span>Rubros y Categorías</span>
+          </button>
+
+          <button onclick="navigateTo('mayorista'); toggleMobileDrawer();" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200">
+            <span class="material-symbols-outlined text-green-500">business_center</span>
+            <span>Portal Mayorista B2B</span>
+          </button>
+
+          <button onclick="navigateTo('carrito'); toggleMobileDrawer();" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200">
+            <span class="material-symbols-outlined text-purple-500">shopping_bag</span>
+            <span>Mi Carrito</span>
+          </button>
+
+          <button onclick="navigateTo('cuenta'); toggleMobileDrawer();" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200">
+            <span class="material-symbols-outlined text-indigo-500">person</span>
+            <span>Mi Cuenta & Crédito</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Footer in Drawer -->
+      <div class="pt-4 border-t border-gray-100 dark:border-slate-800 space-y-3">
+        <button onclick="openQuoteModal(); toggleMobileDrawer();" class="w-full bg-[#f97316] text-white font-bold py-3 rounded-xl text-xs active:scale-95 shadow">
+          Solicitar Presupuesto Obra
+        </button>
+        <p class="text-[10px] text-center text-gray-400 font-mono">Ferretería Santa Cruz • v1.0.0</p>
+      </div>
+    </div>
+  </div>
 
   <!-- MAIN WRAPPER (SIDEBAR + CONTENT) -->
   <div class="flex-1 max-w-7xl w-full mx-auto flex">
@@ -211,32 +294,32 @@
     </aside>
 
     <!-- DYNAMIC MAIN CONTENT PANEL -->
-    <main class="flex-1 p-4 md:p-8 overflow-x-hidden min-h-[calc(100vh-4rem)]">
+    <main class="flex-1 p-3 md:p-8 overflow-x-hidden min-h-[calc(100vh-4rem)]">
       
       <!-- ================= VIEW 1: INICIO ================= -->
-      <section id="view-inicio" class="view-section space-y-8">
+      <section id="view-inicio" class="view-section space-y-6 md:space-y-8">
         
         <!-- Hero Banner -->
-        <div class="relative rounded-2xl bg-[#0f172a] text-white overflow-hidden p-6 md:p-10 flex flex-col justify-center min-h-[260px] shadow-xl">
+        <div class="relative rounded-2xl bg-[#0f172a] text-white overflow-hidden p-5 md:p-10 flex flex-col justify-center min-h-[220px] md:min-h-[260px] shadow-xl">
           <div class="absolute inset-0 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/90 to-transparent z-10"></div>
           <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80" 
                alt="Industrial Hardware Store" class="absolute inset-0 w-full h-full object-cover opacity-30">
           
-          <div class="relative z-20 max-w-xl space-y-4">
-            <span class="inline-block px-3 py-1 bg-[#f97316]/20 border border-[#f97316]/50 text-[#f97316] text-xs font-mono font-bold rounded-full uppercase tracking-wider">
+          <div class="relative z-20 max-w-xl space-y-3 md:space-y-4">
+            <span class="inline-block px-3 py-1 bg-[#f97316]/20 border border-[#f97316]/50 text-[#f97316] text-[11px] md:text-xs font-mono font-bold rounded-full uppercase tracking-wider">
               Proveedor Oficial del Sur Argentino
             </span>
-            <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight leading-tight uppercase">
+            <h2 class="text-xl md:text-4xl font-extrabold tracking-tight leading-tight uppercase">
               Equipamos a los <br><span class="text-[#f97316]">Profesionales</span> del Sur
             </h2>
-            <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+            <p class="text-gray-300 text-xs md:text-base leading-relaxed">
               Herramientas de alta gama, materiales de construcción masiva y atención personalizada a empresas en Río Gallegos, Calafate y toda la provincia.
             </p>
-            <div class="pt-2 flex flex-wrap gap-3">
-              <button onclick="navigateTo('mayorista')" class="bg-[#f97316] hover:bg-[#ea580c] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg transition-transform active:scale-95">
+            <div class="pt-2 flex flex-wrap gap-2.5">
+              <button onclick="navigateTo('mayorista')" class="bg-[#f97316] hover:bg-[#ea580c] text-white px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold shadow-lg transition-transform active:scale-95">
                 Portal Mayorista
               </button>
-              <button onclick="navigateTo('catalogo')" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/30 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors">
+              <button onclick="navigateTo('catalogo')" class="bg-white/10 hover:bg-white/20 backdrop-blur border border-white/30 text-white px-4 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-colors active:scale-95">
                 Explorar Catálogo
               </button>
             </div>
@@ -245,50 +328,50 @@
 
         <!-- Quick Access Bento Grid -->
         <div class="space-y-3">
-          <h3 class="text-lg font-bold flex items-center gap-2">
+          <h3 class="text-base md:text-lg font-bold flex items-center gap-2">
             <span class="w-1.5 h-5 bg-[#f97316] rounded-full"></span>
             Categorías Destacadas
           </h3>
           
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             
-            <div onclick="filterCategoryAndNavigate('Herramientas')" class="col-span-2 bg-white dark:bg-[#0d1c2e] p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer shadow-sm group flex items-center justify-between">
+            <div onclick="filterCategoryAndNavigate('Herramientas')" class="col-span-2 bg-white dark:bg-[#0d1c2e] p-4 md:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer shadow-sm group flex items-center justify-between active:scale-98">
               <div class="space-y-1">
-                <span class="text-xs font-mono text-gray-400">01 / RUBRO PRINCIPAL</span>
-                <h4 class="font-bold text-lg group-hover:text-[#f97316] transition-colors">Herramientas Eléctricas y Manuales</h4>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Taladros, amoladoras, rotomartillos y herramientas de banco</p>
+                <span class="text-[10px] font-mono text-gray-400">01 / RUBRO PRINCIPAL</span>
+                <h4 class="font-bold text-sm md:text-lg group-hover:text-[#f97316] transition-colors">Herramientas Eléctricas y Manuales</h4>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 hidden sm:block">Taladros, amoladoras, rotomartillos y herramientas de banco</p>
               </div>
-              <div class="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-950/40 text-[#f97316] flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-2xl">build</span>
-              </div>
-            </div>
-
-            <div onclick="filterCategoryAndNavigate('Materiales')" class="bg-white dark:bg-[#0d1c2e] p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer shadow-sm group flex flex-col justify-between h-36">
-              <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                <span class="material-symbols-outlined">grid_view</span>
-              </div>
-              <div>
-                <h4 class="font-bold text-sm group-hover:text-[#f97316] transition-colors">Materiales</h4>
-                <p class="text-[11px] text-gray-500 dark:text-gray-400">Cementos, aceros, áridos</p>
+              <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-orange-100 dark:bg-orange-950/40 text-[#f97316] flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-xl md:text-2xl">build</span>
               </div>
             </div>
 
-            <div onclick="filterCategoryAndNavigate('Promociones')" class="bg-white dark:bg-[#0d1c2e] p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer shadow-sm group flex flex-col justify-between h-36">
-              <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center">
-                <span class="material-symbols-outlined">local_offer</span>
+            <div onclick="filterCategoryAndNavigate('Materiales')" class="bg-white dark:bg-[#0d1c2e] p-4 md:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer shadow-sm group flex flex-col justify-between h-32 md:h-36 active:scale-98">
+              <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <span class="material-symbols-outlined text-lg md:text-xl">grid_view</span>
               </div>
               <div>
-                <h4 class="font-bold text-sm group-hover:text-[#f97316] transition-colors">Ofertas Obra</h4>
-                <p class="text-[11px] text-gray-500 dark:text-gray-400">Descuentos por pallet</p>
+                <h4 class="font-bold text-xs md:text-sm group-hover:text-[#f97316] transition-colors">Materiales</h4>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400">Cementos, aceros, áridos</p>
+              </div>
+            </div>
+
+            <div onclick="filterCategoryAndNavigate('Promociones')" class="bg-white dark:bg-[#0d1c2e] p-4 md:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer shadow-sm group flex flex-col justify-between h-32 md:h-36 active:scale-98">
+              <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center">
+                <span class="material-symbols-outlined text-lg md:text-xl">local_offer</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-xs md:text-sm group-hover:text-[#f97316] transition-colors">Ofertas Obra</h4>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400">Descuentos por pallet</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Featured Products Section -->
-        <div class="space-y-4 pt-4">
+        <div class="space-y-4 pt-2">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold flex items-center gap-2">
+            <h3 class="text-base md:text-lg font-bold flex items-center gap-2">
               <span class="w-1.5 h-5 bg-[#f97316] rounded-full"></span>
               Productos Recomendados
             </h3>
@@ -297,23 +380,23 @@
             </button>
           </div>
 
-          <div id="homeFeaturedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div id="homeFeaturedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <!-- Dynamically populated by JS -->
           </div>
         </div>
 
         <!-- Branch Stores Banner -->
-        <div class="p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-700">
-          <div class="space-y-2">
-            <div class="flex items-center gap-2 text-[#f97316] font-mono text-xs font-bold uppercase">
+        <div class="p-5 md:p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-700">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 text-[#f97316] font-mono text-[11px] font-bold uppercase">
               <span class="material-symbols-outlined text-sm">map</span> Cobertura Provincial
             </div>
-            <h3 class="text-xl font-bold">Sucursales con Entrega Inmediata en Obra</h3>
+            <h3 class="text-lg md:text-xl font-bold">Sucursales con Entrega Inmediata en Obra</h3>
             <p class="text-xs text-gray-300 max-w-lg">
-              Contamos con depósitos propios en Río Gallegos, El Calafate y Puerto Deseado. Logística pesada integrada para entregas en toda la Patagonia.
+              Contamos con depósitos propios en Río Gallegos, El Calafate y Puerto Deseado. Logística pesada integrada.
             </p>
           </div>
-          <button onclick="navigateTo('mayorista')" class="shrink-0 bg-white text-slate-900 hover:bg-gray-100 font-bold px-5 py-2.5 rounded-xl text-xs transition-colors shadow">
+          <button onclick="navigateTo('mayorista')" class="w-full md:w-auto shrink-0 bg-white text-slate-900 hover:bg-gray-100 font-bold px-5 py-2.5 rounded-xl text-xs transition-colors shadow active:scale-95">
             Consultar Entregas
           </button>
         </div>
@@ -321,19 +404,19 @@
       </section>
 
       <!-- ================= VIEW 2: CATÁLOGO ================= -->
-      <section id="view-catalogo" class="view-section hidden space-y-6">
+      <section id="view-catalogo" class="view-section hidden space-y-4 md:space-y-6">
         
         <!-- Search & Filter Controls -->
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white dark:bg-[#0d1c2e] p-4 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-white dark:bg-[#0d1c2e] p-4 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm">
           <div>
-            <h2 class="text-xl font-bold">Catálogo de Productos</h2>
+            <h2 class="text-lg md:text-xl font-bold">Catálogo de Productos</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400">Precios actualizados en tiempo real según tipo de cliente</p>
           </div>
 
-          <div class="flex flex-wrap w-full md:w-auto items-center gap-3">
+          <div class="flex flex-wrap w-full md:w-auto items-center gap-2 md:gap-3">
             
             <!-- Category Selector -->
-            <select id="catalogCategorySelect" onchange="applyFilters()" class="text-xs py-2 px-3 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-[#f97316]">
+            <select id="catalogCategorySelect" onchange="applyFilters()" class="flex-1 md:flex-none text-xs py-2 px-3 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg focus:ring-1 focus:ring-[#f97316]">
               <option value="TODOS">Todas las Categorías</option>
               <option value="Herramientas">Herramientas Eléctricas & Manuales</option>
               <option value="Materiales">Materiales de Construcción</option>
@@ -342,7 +425,7 @@
             </select>
 
             <!-- Stock Filter -->
-            <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+            <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer select-none">
               <input type="checkbox" id="catalogInStockOnly" onchange="applyFilters()" class="rounded text-[#f97316] focus:ring-[#f97316]">
               <span>Solo en Stock</span>
             </label>
@@ -350,30 +433,30 @@
         </div>
 
         <!-- Product Grid -->
-        <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <!-- Populated by JS -->
         </div>
       </section>
 
       <!-- ================= VIEW 3: DETALLE DE PRODUCTO ================= -->
-      <section id="view-detalle" class="view-section hidden space-y-6">
-        <button onclick="navigateTo('catalogo')" class="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[#f97316]">
+      <section id="view-detalle" class="view-section hidden space-y-4">
+        <button onclick="navigateTo('catalogo')" class="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[#f97316] active:scale-95">
           <span class="material-symbols-outlined text-sm">arrow_back</span> Volver al Catálogo
         </button>
 
-        <div id="productDetailContainer" class="bg-white dark:bg-[#0d1c2e] rounded-2xl border border-gray-200 dark:border-slate-800 p-6 shadow-sm">
+        <div id="productDetailContainer" class="bg-white dark:bg-[#0d1c2e] rounded-2xl border border-gray-200 dark:border-slate-800 p-4 md:p-6 shadow-sm">
           <!-- Populated dynamically by JS -->
         </div>
       </section>
 
       <!-- ================= VIEW 4: CARRITO Y PAGO ================= -->
-      <section id="view-carrito" class="view-section hidden space-y-6">
-        <h2 class="text-xl font-bold flex items-center gap-2">
+      <section id="view-carrito" class="view-section hidden space-y-4 md:space-y-6">
+        <h2 class="text-lg md:text-xl font-bold flex items-center gap-2">
           <span class="material-symbols-outlined text-[#f97316]">shopping_bag</span>
           Mi Carrito de Compras
         </h2>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           
           <!-- Cart Table -->
           <div class="lg:col-span-2 bg-white dark:bg-[#0d1c2e] rounded-2xl border border-gray-200 dark:border-slate-800 p-4 md:p-6 shadow-sm">
@@ -383,10 +466,10 @@
           </div>
 
           <!-- Checkout Summary Sidebar -->
-          <div class="bg-white dark:bg-[#0d1c2e] rounded-2xl border border-gray-200 dark:border-slate-800 p-6 space-y-6 shadow-sm h-fit">
+          <div class="bg-white dark:bg-[#0d1c2e] rounded-2xl border border-gray-200 dark:border-slate-800 p-5 md:p-6 space-y-5 shadow-sm h-fit">
             <h3 class="font-bold text-base border-b border-gray-100 dark:border-slate-800 pb-3">Resumen de la Compra</h3>
             
-            <div class="space-y-3 text-sm">
+            <div class="space-y-2.5 text-xs md:text-sm">
               <div class="flex justify-between text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
                 <span id="cartSubtotal">$ 0</span>
@@ -402,22 +485,22 @@
                 <span id="cartTax">$ 0</span>
               </div>
 
-              <div class="pt-3 border-t border-gray-200 dark:border-slate-800 flex justify-between text-lg font-bold">
+              <div class="pt-3 border-t border-gray-200 dark:border-slate-800 flex justify-between text-base md:text-lg font-bold">
                 <span>Total Final</span>
                 <span id="cartTotal" class="text-[#f97316]">$ 0</span>
               </div>
             </div>
 
             <!-- Coupon Code Input -->
-            <div class="space-y-2 pt-2">
-              <label class="text-xs font-mono font-semibold text-gray-500 uppercase">Código Promocional</label>
+            <div class="space-y-1.5 pt-2">
+              <label class="text-[11px] font-mono font-semibold text-gray-500 uppercase">Código Promocional</label>
               <div class="flex gap-2">
                 <input type="text" id="couponInput" placeholder="Ej: MAYORISTA2026" class="flex-1 text-xs py-2 px-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 uppercase">
-                <button onclick="applyCoupon()" class="bg-slate-800 text-white hover:bg-slate-900 px-3 py-2 rounded-lg text-xs font-bold">Aplicar</button>
+                <button onclick="applyCoupon()" class="bg-slate-800 text-white hover:bg-slate-900 px-3 py-2 rounded-lg text-xs font-bold active:scale-95">Aplicar</button>
               </div>
             </div>
 
-            <button onclick="openCheckoutModal()" class="w-full bg-[#f97316] hover:bg-[#ea580c] text-white py-3 rounded-xl font-bold shadow-lg transition-transform active:scale-98">
+            <button onclick="openCheckoutModal()" class="w-full bg-[#f97316] hover:bg-[#ea580c] text-white py-3 rounded-xl font-bold text-sm shadow-lg transition-transform active:scale-95">
               Finalizar Pedido
             </button>
           </div>
@@ -425,29 +508,29 @@
       </section>
 
       <!-- ================= VIEW 5: PORTAL MAYORISTA ================= -->
-      <section id="view-mayorista" class="view-section hidden space-y-6">
-        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-6 md:p-8 border border-slate-700 shadow-xl space-y-4">
+      <section id="view-mayorista" class="view-section hidden space-y-4 md:space-y-6">
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 md:p-8 border border-slate-700 shadow-xl space-y-3">
           <div class="flex items-center gap-2">
-            <span class="px-2.5 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/40 text-xs font-mono font-bold rounded-full">PORTAL B2B</span>
-            <span class="text-xs text-gray-400 font-mono">Facturación Electrónica AFIP A / B</span>
+            <span class="px-2.5 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] md:text-xs font-mono font-bold rounded-full">PORTAL B2B</span>
+            <span class="text-[10px] text-gray-400 font-mono">Facturación Electrónica AFIP A / B</span>
           </div>
-          <h2 class="text-2xl md:text-3xl font-extrabold">Portal Mayorista y Cuentas Corrientes</h2>
-          <p class="text-sm text-gray-300 max-w-2xl">
+          <h2 class="text-xl md:text-3xl font-extrabold">Portal Mayorista y Cuentas Corrientes</h2>
+          <p class="text-xs md:text-sm text-gray-300 max-w-2xl leading-relaxed">
             Plataforma exclusiva para empresas constructoras, contratistas e industrias. Gestioná tu línea de crédito, descargá listas de precios en Excel/PDF y emití pedidos con despacho directo a obra.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           
           <!-- Credit Line Status -->
-          <div class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="bg-white dark:bg-[#0d1c2e] p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold text-gray-400">ESTADO DE CUENTA</span>
+              <span class="text-[10px] font-mono font-bold text-gray-400">ESTADO DE CUENTA</span>
               <span class="material-symbols-outlined text-green-500">verified</span>
             </div>
             <div>
               <p class="text-xs text-gray-500">Línea de Crédito Disponible</p>
-              <h3 class="text-2xl font-extrabold text-slate-900 dark:text-white">$ 1.850.000</h3>
+              <h3 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white">$ 1.850.000</h3>
               <p class="text-[11px] text-gray-400 mt-1">Límite Total: $ 2.500.000 (Plazo 30 días)</p>
             </div>
             <div class="w-full bg-gray-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -456,21 +539,21 @@
           </div>
 
           <!-- Price List Downloads -->
-          <div class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="bg-white dark:bg-[#0d1c2e] p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold text-gray-400">DESCARGAS</span>
+              <span class="text-[10px] font-mono font-bold text-gray-400">DESCARGAS</span>
               <span class="material-symbols-outlined text-[#f97316]">download</span>
             </div>
             <div>
-              <h3 class="text-base font-bold">Listas de Precios Vigentes</h3>
-              <p class="text-xs text-gray-500 mt-1">Actualizado Agosto 2026</p>
+              <h3 class="text-sm md:text-base font-bold">Listas de Precios Vigentes</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Actualizado Agosto 2026</p>
             </div>
             <div class="space-y-2">
-              <button onclick="downloadPriceList('PDF')" class="w-full flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-slate-900 hover:bg-gray-100 text-xs font-semibold">
+              <button onclick="downloadPriceList('PDF')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 hover:bg-gray-100 text-xs font-semibold active:scale-98">
                 <span>Catálogo Completo (PDF)</span>
                 <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
               </button>
-              <button onclick="downloadPriceList('EXCEL')" class="w-full flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-slate-900 hover:bg-gray-100 text-xs font-semibold">
+              <button onclick="downloadPriceList('EXCEL')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 hover:bg-gray-100 text-xs font-semibold active:scale-98">
                 <span>Matriz de Precios (Excel CSV)</span>
                 <span class="material-symbols-outlined text-sm">grid_on</span>
               </button>
@@ -478,16 +561,16 @@
           </div>
 
           <!-- Direct Quote Request Form -->
-          <div class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="bg-white dark:bg-[#0d1c2e] p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-mono font-bold text-gray-400">ACOPIO MASIVO</span>
+              <span class="text-[10px] font-mono font-bold text-gray-400">ACOPIO MASIVO</span>
               <span class="material-symbols-outlined text-blue-500">assignment</span>
             </div>
             <div>
-              <h3 class="text-base font-bold">Cargar Pedido por Cómputo</h3>
-              <p class="text-xs text-gray-500 mt-1">Envianos tu planilla de obra para cotización express</p>
+              <h3 class="text-sm md:text-base font-bold">Cargar Pedido por Cómputo</h3>
+              <p class="text-xs text-gray-500 mt-0.5">Envianos tu planilla de obra para cotización express</p>
             </div>
-            <button onclick="openQuoteModal()" class="w-full bg-[#f97316] text-white py-2.5 rounded-lg text-xs font-bold hover:bg-[#ea580c]">
+            <button onclick="openQuoteModal()" class="w-full bg-[#f97316] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#ea580c] active:scale-95">
               Cargar Cómputo de Obra
             </button>
           </div>
@@ -495,74 +578,82 @@
       </section>
 
       <!-- ================= VIEW 6: CATEGORÍAS ================= -->
-      <section id="view-categorias" class="view-section hidden space-y-6">
-        <h2 class="text-xl font-bold">Rubros y Categorías</h2>
+      <section id="view-categorias" class="view-section hidden space-y-4 md:space-y-6">
+        <h2 class="text-lg md:text-xl font-bold">Rubros y Categorías</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div onclick="filterCategoryAndNavigate('Herramientas')" class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-3">
-            <div class="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-950 text-[#f97316] flex items-center justify-center">
-              <span class="material-symbols-outlined text-2xl">build</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div onclick="filterCategoryAndNavigate('Herramientas')" class="bg-white dark:bg-[#0d1c2e] p-5 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-2 active:scale-98">
+            <div class="w-11 h-11 rounded-xl bg-orange-100 dark:bg-orange-950 text-[#f97316] flex items-center justify-center">
+              <span class="material-symbols-outlined text-xl">build</span>
             </div>
-            <h3 class="text-lg font-bold">Herramientas</h3>
+            <h3 class="text-base font-bold">Herramientas</h3>
             <p class="text-xs text-gray-500">Eléctricas, neumáticas, manuales de alta precisión.</p>
           </div>
 
-          <div onclick="filterCategoryAndNavigate('Materiales')" class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-3">
-            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-500 flex items-center justify-center">
-              <span class="material-symbols-outlined text-2xl">grid_view</span>
+          <div onclick="filterCategoryAndNavigate('Materiales')" class="bg-white dark:bg-[#0d1c2e] p-5 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-2 active:scale-98">
+            <div class="w-11 h-11 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-500 flex items-center justify-center">
+              <span class="material-symbols-outlined text-xl">grid_view</span>
             </div>
-            <h3 class="text-lg font-bold">Materiales de Construcción</h3>
+            <h3 class="text-base font-bold">Materiales de Construcción</h3>
             <p class="text-xs text-gray-500">Bolsas de cemento, cal, mallas electrosoldadas, hierros.</p>
           </div>
 
-          <div onclick="filterCategoryAndNavigate('Electricidad')" class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-3">
-            <div class="w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-950 text-yellow-500 flex items-center justify-center">
-              <span class="material-symbols-outlined text-2xl">bolt</span>
+          <div onclick="filterCategoryAndNavigate('Electricidad')" class="bg-white dark:bg-[#0d1c2e] p-5 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-2 active:scale-98">
+            <div class="w-11 h-11 rounded-xl bg-yellow-100 dark:bg-yellow-950 text-yellow-500 flex items-center justify-center">
+              <span class="material-symbols-outlined text-xl">bolt</span>
             </div>
-            <h3 class="text-lg font-bold">Electricidad Industrial</h3>
+            <h3 class="text-base font-bold">Electricidad Industrial</h3>
             <p class="text-xs text-gray-500">Cables subterráneos, llaves térmicas, proyectores LED.</p>
+          </div>
+
+          <div onclick="filterCategoryAndNavigate('Seguridad')" class="bg-white dark:bg-[#0d1c2e] p-5 rounded-2xl border border-gray-200 dark:border-slate-800 hover:border-[#f97316] transition-all cursor-pointer space-y-2 active:scale-98">
+            <div class="w-11 h-11 rounded-xl bg-red-100 dark:bg-red-950 text-red-500 flex items-center justify-center">
+              <span class="material-symbols-outlined text-xl">security</span>
+            </div>
+            <h3 class="text-base font-bold">Seguridad Industrial</h3>
+            <p class="text-xs text-gray-500">Cascos IRAM, guantes descarne, arneses de protección.</p>
           </div>
         </div>
       </section>
 
       <!-- ================= VIEW 7: MI CUENTA ================= -->
-      <section id="view-cuenta" class="view-section hidden space-y-6">
-        <div class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-xl">
+      <section id="view-cuenta" class="view-section hidden space-y-4 md:space-y-6">
+        <div class="bg-white dark:bg-[#0d1c2e] p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-lg shrink-0">
               CS
             </div>
             <div>
-              <h2 class="text-lg font-bold">Construcciones del Sur S.A.</h2>
+              <h2 class="text-base md:text-lg font-bold">Construcciones del Sur S.A.</h2>
               <p class="text-xs text-gray-500 font-mono">CUIT: 30-71458962-4 • Cliente Mayorista #4029</p>
             </div>
           </div>
-          <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Cuenta Verificada AFIP</span>
+          <span class="px-2.5 py-1 bg-green-100 text-green-700 text-[11px] font-bold rounded-full">Cuenta Verificada AFIP</span>
         </div>
 
-        <div class="bg-white dark:bg-[#0d1c2e] p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-4">
-          <h3 class="font-bold text-base">Historial de Pedidos Recientes</h3>
+        <div class="bg-white dark:bg-[#0d1c2e] p-5 md:p-6 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm space-y-4">
+          <h3 class="font-bold text-sm md:text-base">Historial de Pedidos Recientes</h3>
           
           <div class="divide-y divide-gray-100 dark:divide-slate-800">
-            <div class="py-3 flex items-center justify-between text-xs">
+            <div class="py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-xs">
               <div>
                 <p class="font-bold">Pedido #SC-8921</p>
                 <p class="text-gray-500">12 Ago 2026 • 24 Bultos (Cemento + Hierros)</p>
               </div>
-              <div class="text-right">
+              <div class="sm:text-right">
                 <span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-bold rounded">En Camino (Flete Central)</span>
-                <p class="font-bold text-sm mt-1">$ 485.000</p>
+                <p class="font-bold text-sm mt-0.5">$ 485.000</p>
               </div>
             </div>
 
-            <div class="py-3 flex items-center justify-between text-xs">
+            <div class="py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-xs">
               <div>
                 <p class="font-bold">Pedido #SC-8410</p>
                 <p class="text-gray-500">02 Ago 2026 • Taladro Percutor + Amoladora</p>
               </div>
-              <div class="text-right">
+              <div class="sm:text-right">
                 <span class="px-2 py-0.5 bg-green-100 text-green-700 font-bold rounded">Entregado en Obra</span>
-                <p class="font-bold text-sm mt-1">$ 118.400</p>
+                <p class="font-bold text-sm mt-0.5">$ 118.400</p>
               </div>
             </div>
           </div>
@@ -573,32 +664,37 @@
   </div>
 
   <!-- MOBILE BOTTOM NAV BAR -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#09101d] border-t border-gray-200 dark:border-slate-800 flex items-center justify-around z-50 px-2 shadow-lg">
-    <button onclick="navigateTo('inicio')" id="m-nav-inicio" class="flex flex-col items-center gap-1 text-xs text-[#f97316] font-bold">
-      <span class="material-symbols-outlined">home</span>
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#09101d] border-t border-gray-200 dark:border-slate-800 flex items-center justify-around z-50 px-1 shadow-2xl">
+    <button onclick="navigateTo('inicio')" id="m-nav-inicio" class="flex flex-col items-center justify-center w-full h-full text-[10px] text-[#f97316] font-bold active:scale-95">
+      <span class="material-symbols-outlined text-xl">home</span>
       <span>Inicio</span>
     </button>
 
-    <button onclick="navigateTo('catalogo')" id="m-nav-catalogo" class="flex flex-col items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-      <span class="material-symbols-outlined">storefront</span>
+    <button onclick="navigateTo('catalogo')" id="m-nav-catalogo" class="flex flex-col items-center justify-center w-full h-full text-[10px] text-gray-500 dark:text-gray-400 active:scale-95">
+      <span class="material-symbols-outlined text-xl">storefront</span>
       <span>Catálogo</span>
     </button>
 
-    <button onclick="navigateTo('carrito')" id="m-nav-carrito" class="flex flex-col items-center gap-1 text-xs text-gray-500 dark:text-gray-400 relative">
-      <span class="material-symbols-outlined">shopping_cart</span>
+    <button onclick="navigateTo('categorias')" id="m-nav-categorias" class="flex flex-col items-center justify-center w-full h-full text-[10px] text-gray-500 dark:text-gray-400 active:scale-95">
+      <span class="material-symbols-outlined text-xl">category</span>
+      <span>Rubros</span>
+    </button>
+
+    <button onclick="navigateTo('carrito')" id="m-nav-carrito" class="flex flex-col items-center justify-center w-full h-full text-[10px] text-gray-500 dark:text-gray-400 relative active:scale-95">
+      <span class="material-symbols-outlined text-xl">shopping_cart</span>
       <span>Carrito</span>
     </button>
 
-    <button onclick="navigateTo('cuenta')" id="m-nav-cuenta" class="flex flex-col items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-      <span class="material-symbols-outlined">person</span>
+    <button onclick="navigateTo('cuenta')" id="m-nav-cuenta" class="flex flex-col items-center justify-center w-full h-full text-[10px] text-gray-500 dark:text-gray-400 active:scale-95">
+      <span class="material-symbols-outlined text-xl">person</span>
       <span>Cuenta</span>
     </button>
   </nav>
 
   <!-- QUICK VIEW PRODUCT MODAL -->
   <div id="productModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#0d1c2e] rounded-2xl max-w-xl w-full p-6 space-y-4 border border-gray-200 dark:border-slate-800 relative shadow-2xl">
-      <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white">
+    <div class="bg-white dark:bg-[#0d1c2e] rounded-2xl max-w-xl w-full p-5 md:p-6 space-y-4 border border-gray-200 dark:border-slate-800 relative shadow-2xl">
+      <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white p-1">
         <span class="material-symbols-outlined">close</span>
       </button>
       <div id="modalContent"></div>
@@ -613,14 +709,14 @@
       </div>
       <h3 class="text-xl font-extrabold">¡Pedido Confirmado!</h3>
       <p class="text-xs text-gray-500">Se ha registrado el Pedido <span id="checkoutOrderNum" class="font-mono font-bold text-slate-900 dark:text-white">#SC-9012</span> con éxito. Te enviamos la confirmación por email.</p>
-      <button onclick="closeCheckoutModal()" class="w-full bg-[#f97316] text-white py-2.5 rounded-xl font-bold text-xs">
+      <button onclick="closeCheckoutModal()" class="w-full bg-[#f97316] text-white py-3 rounded-xl font-bold text-xs active:scale-95">
         Volver a la Tienda
       </button>
     </div>
   </div>
 
   <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toastContainer" class="fixed bottom-20 md:bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:right-6 z-50 space-y-2 pointer-events-none"></div>
 
   <!-- Application Logic JS -->
   <script src="/app.js"></script>

@@ -125,6 +125,20 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartBadge();
 });
 
+// Mobile Drawer Controller
+function toggleMobileDrawer() {
+  const drawer = document.getElementById('mobileDrawer');
+  if (!drawer) return;
+  
+  if (drawer.classList.contains('hidden')) {
+    drawer.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  } else {
+    drawer.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+}
+
 // Navigation Engine
 function navigateTo(viewId) {
   appState.currentView = viewId;
@@ -139,7 +153,7 @@ function navigateTo(viewId) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Update active state on Nav Buttons
+  // Update active state on Desktop Nav Buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.classList.remove('bg-[#f97316]/10', 'text-[#f97316]', 'font-bold');
     btn.classList.add('text-gray-700', 'dark:text-gray-300');
@@ -150,14 +164,14 @@ function navigateTo(viewId) {
     activeBtn.classList.add('bg-[#f97316]/10', 'text-[#f97316]', 'font-bold');
   }
 
-  // Update Mobile Bottom Nav
-  ['inicio', 'catalogo', 'carrito', 'cuenta'].forEach(mId => {
+  // Update Mobile Bottom Nav Active States
+  ['inicio', 'catalogo', 'categorias', 'carrito', 'cuenta'].forEach(mId => {
     const mBtn = document.getElementById(`m-nav-${mId}`);
     if (mBtn) {
       if (mId === viewId) {
-        mBtn.className = "flex flex-col items-center gap-1 text-xs text-[#f97316] font-bold";
+        mBtn.className = "flex flex-col items-center justify-center w-full h-full text-[10px] text-[#f97316] font-bold active:scale-95";
       } else {
-        mBtn.className = "flex flex-col items-center gap-1 text-xs text-gray-500 dark:text-gray-400";
+        mBtn.className = "flex flex-col items-center justify-center w-full h-full text-[10px] text-gray-500 dark:text-gray-400 active:scale-95";
       }
     }
   });
@@ -183,31 +197,43 @@ function toggleTheme() {
   }
 }
 
+// Quick Tariff Mode Toggle for Mobile Header
+function toggleTariffModeQuick() {
+  const newMode = appState.tariffMode === 'retail' ? 'wholesale' : 'retail';
+  setTariffMode(newMode);
+}
+
 // Tariff Mode Switcher (Minorista vs Mayorista)
 function setTariffMode(mode) {
   appState.tariffMode = mode;
   
   const btnRetail = document.getElementById('btnSideRetail');
   const btnWholesale = document.getElementById('btnSideWholesale');
-  const headerBadge = document.getElementById('wholesaleHeaderBadge');
+  const mBtnRetail = document.getElementById('mBtnSideRetail');
+  const mBtnWholesale = document.getElementById('mBtnSideWholesale');
   const badgeText = document.getElementById('headerBadgeText');
 
   if (mode === 'wholesale') {
-    btnWholesale.className = "py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
-    btnRetail.className = "py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-slate-900";
+    if (btnWholesale) btnWholesale.className = "py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
+    if (btnRetail) btnRetail.className = "py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-slate-900";
     
-    headerBadge.classList.remove('hidden');
-    badgeText.innerText = "Mayorista (15% Desc)";
-    showToast('Tarifa Mayorista aplicada a todo el catálogo');
+    if (mBtnWholesale) mBtnWholesale.className = "py-2 px-2 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
+    if (mBtnRetail) mBtnRetail.className = "py-2 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400";
+
+    if (badgeText) badgeText.innerText = "Mayorista (-15%)";
+    showToast('Tarifa Mayorista (15% Desc) activada');
   } else {
-    btnRetail.className = "py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
-    btnWholesale.className = "py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-slate-900";
+    if (btnRetail) btnRetail.className = "py-1.5 px-2 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
+    if (btnWholesale) btnWholesale.className = "py-1.5 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400 hover:text-slate-900";
     
-    badgeText.innerText = "Minorista";
+    if (mBtnRetail) mBtnRetail.className = "py-2 px-2 rounded-lg text-xs font-bold transition-all bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
+    if (mBtnWholesale) mBtnWholesale.className = "py-2 px-2 rounded-lg text-xs font-semibold transition-all text-gray-600 dark:text-gray-400";
+
+    if (badgeText) badgeText.innerText = "Minorista";
     showToast('Tarifa Consumidor Final activada');
   }
 
-  // Re-render price displays
+  // Re-render price displays across active views
   renderHomeFeatured();
   renderCatalog();
   if (appState.currentView === 'carrito') renderCart();
@@ -218,7 +244,7 @@ function getProductPrice(prod) {
   return appState.tariffMode === 'wholesale' ? prod.priceWholesale : prod.priceRetail;
 }
 
-// Format Currency CLP/ARS
+// Format Currency
 function formatMoney(amount) {
   return `$ ${amount.toLocaleString('es-AR')}`;
 }
@@ -267,14 +293,14 @@ function renderCatalog() {
   container.innerHTML = filtered.map(p => createProductCardHTML(p)).join('');
 }
 
-// Create Product Card HTML
+// Create Product Card HTML (Optimized for Touch)
 function createProductCardHTML(p) {
   const price = getProductPrice(p);
   const isWholesale = appState.tariffMode === 'wholesale';
 
   return `
     <div class="bg-white dark:bg-[#0d1c2e] rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden flex flex-col justify-between shadow-sm hover:border-[#f97316] transition-all group">
-      <div class="relative h-44 bg-gray-50 dark:bg-slate-900/60 p-4 flex items-center justify-center overflow-hidden">
+      <div onclick="showProductDetail(${p.id})" class="relative h-40 md:h-44 bg-gray-50 dark:bg-slate-900/60 p-3 md:p-4 flex items-center justify-center overflow-hidden cursor-pointer">
         
         <!-- Stock Tag -->
         <span class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold ${p.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
@@ -284,18 +310,18 @@ function createProductCardHTML(p) {
         <img src="${p.image}" alt="${p.name}" class="h-full w-full object-contain group-hover:scale-105 transition-transform duration-300">
       </div>
 
-      <div class="p-4 flex flex-col flex-1 justify-between space-y-3">
+      <div class="p-3 md:p-4 flex flex-col flex-1 justify-between space-y-3">
         <div>
           <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider">${p.category}</span>
-          <h4 onclick="showProductDetail(${p.id})" class="font-bold text-sm leading-snug hover:text-[#f97316] cursor-pointer transition-colors line-clamp-2 mt-1">
+          <h4 onclick="showProductDetail(${p.id})" class="font-bold text-xs md:text-sm leading-snug hover:text-[#f97316] cursor-pointer transition-colors line-clamp-2 mt-0.5">
             ${p.name}
           </h4>
         </div>
 
         <div class="pt-2 border-t border-gray-100 dark:border-slate-800">
-          ${p.oldPrice && !isWholesale ? `<span class="text-[11px] text-gray-400 line-through">${formatMoney(p.oldPrice)}</span>` : ''}
+          ${p.oldPrice && !isWholesale ? `<span class="text-[10px] text-gray-400 line-through">${formatMoney(p.oldPrice)}</span>` : ''}
           <div class="flex items-baseline justify-between">
-            <span class="text-lg font-extrabold text-slate-900 dark:text-white">${formatMoney(price)}</span>
+            <span class="text-base md:text-lg font-extrabold text-slate-900 dark:text-white">${formatMoney(price)}</span>
             <span class="text-[10px] font-mono font-bold ${isWholesale ? 'text-[#f97316]' : 'text-gray-400'} uppercase">
               ${isWholesale ? 'Mayorista' : 'Minorista'}
             </span>
@@ -303,10 +329,10 @@ function createProductCardHTML(p) {
         </div>
 
         <div class="grid grid-cols-4 gap-2 pt-1">
-          <button onclick="showProductDetail(${p.id})" class="col-span-1 p-2 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-300" title="Ver Ficha Técnica">
-            <span class="material-symbols-outlined text-sm">visibility</span>
+          <button onclick="showProductDetail(${p.id})" class="col-span-1 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-300 active:scale-95" title="Ver Ficha Técnica">
+            <span class="material-symbols-outlined text-base">visibility</span>
           </button>
-          <button onclick="addToCart(${p.id})" class="col-span-3 bg-[#0f172a] hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95">
+          <button onclick="addToCart(${p.id})" class="col-span-3 bg-[#0f172a] hover:bg-slate-800 text-white font-bold py-2.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow">
             <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
             <span>Agregar</span>
           </button>
@@ -349,54 +375,54 @@ function showProductDetail(productId) {
 
   const container = document.getElementById('productDetailContainer');
   container.innerHTML = `
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="bg-gray-50 dark:bg-slate-900/60 p-6 rounded-xl flex items-center justify-center border border-gray-100 dark:border-slate-800">
-        <img src="${prod.image}" alt="${prod.name}" class="max-h-80 object-contain">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+      <div class="bg-gray-50 dark:bg-slate-900/60 p-4 md:p-6 rounded-xl flex items-center justify-center border border-gray-100 dark:border-slate-800">
+        <img src="${prod.image}" alt="${prod.name}" class="max-h-64 md:max-h-80 object-contain">
       </div>
 
-      <div class="space-y-5">
+      <div class="space-y-4 md:space-y-5">
         <div>
-          <span class="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-xs font-mono font-bold rounded-full uppercase text-gray-500">${prod.category}</span>
-          <h2 class="text-2xl font-bold mt-2">${prod.name}</h2>
-          <p class="text-xs text-gray-400 font-mono mt-1">SKU: FSC-00${prod.id} • IRAM ISO 9001</p>
+          <span class="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 text-[10px] md:text-xs font-mono font-bold rounded-full uppercase text-gray-500">${prod.category}</span>
+          <h2 class="text-xl md:text-2xl font-bold mt-2 leading-snug">${prod.name}</h2>
+          <p class="text-[11px] text-gray-400 font-mono mt-1">SKU: FSC-00${prod.id} • IRAM ISO 9001</p>
         </div>
 
         <div class="p-4 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 space-y-1">
-          <p class="text-xs text-gray-400 uppercase font-mono">Precio Unitario (${isWholesale ? 'Mayorista' : 'Minorista'})</p>
+          <p class="text-[10px] text-gray-400 uppercase font-mono">Precio Unitario (${isWholesale ? 'Mayorista' : 'Minorista'})</p>
           <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-[#f97316]">${formatMoney(price)}</span>
-            ${prod.oldPrice ? `<span class="text-sm text-gray-400 line-through">${formatMoney(prod.oldPrice)}</span>` : ''}
+            <span class="text-2xl md:text-3xl font-extrabold text-[#f97316]">${formatMoney(price)}</span>
+            ${prod.oldPrice ? `<span class="text-xs text-gray-400 line-through">${formatMoney(prod.oldPrice)}</span>` : ''}
           </div>
-          <p class="text-[11px] text-gray-500">Impuestos incluidos (IVA 21%). Descuentos aplicables por pallet en el checkout.</p>
+          <p class="text-[10px] text-gray-500">Impuestos incluidos (IVA 21%). Descuentos aplicables por pallet en checkout.</p>
         </div>
 
         <div>
-          <h4 class="font-bold text-xs uppercase font-mono text-gray-400 mb-2">Especificaciones Técnicas</h4>
+          <h4 class="font-bold text-xs uppercase font-mono text-gray-400 mb-1.5">Especificaciones Técnicas</h4>
           <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-100 dark:border-slate-800">
             ${prod.specs}
           </p>
         </div>
 
         <div>
-          <h4 class="font-bold text-xs uppercase font-mono text-gray-400 mb-2">Disponibilidad en Depósitos</h4>
+          <h4 class="font-bold text-xs uppercase font-mono text-gray-400 mb-1.5">Disponibilidad en Depósitos</h4>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="p-2 rounded bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 flex justify-between">
-              <span>Depósito Río Gallegos</span>
+            <div class="p-2 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 flex justify-between">
+              <span>Río Gallegos</span>
               <span class="font-bold">${prod.branchStock["Río Gallegos"]} un.</span>
             </div>
-            <div class="p-2 rounded bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 flex justify-between">
-              <span>Depósito El Calafate</span>
+            <div class="p-2 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 flex justify-between">
+              <span>El Calafate</span>
               <span class="font-bold">${prod.branchStock["El Calafate"]} un.</span>
             </div>
           </div>
         </div>
 
-        <div class="pt-4 flex gap-3">
-          <button onclick="addToCart(${prod.id}); navigateTo('carrito');" class="flex-1 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold py-3 px-4 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined">shopping_cart</span>
+        <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+          <button onclick="addToCart(${prod.id}); navigateTo('carrito');" class="flex-1 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold py-3 px-4 rounded-xl text-xs md:text-sm shadow-lg flex items-center justify-center gap-2 active:scale-95">
+            <span class="material-symbols-outlined text-base">shopping_cart</span>
             <span>Comprar Ahora</span>
           </button>
-          <button onclick="openQuoteModal()" class="bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl text-xs hover:bg-slate-900">
+          <button onclick="openQuoteModal()" class="bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl text-xs hover:bg-slate-900 active:scale-95">
             Pedir Presupuesto
           </button>
         </div>
@@ -408,27 +434,6 @@ function showProductDetail(productId) {
 }
 
 // Quick View Modal
-function showQuickModal(productId) {
-  const prod = PRODUCTS.find(p => p.id === productId);
-  if (!prod) return;
-
-  const content = document.getElementById('modalContent');
-  content.innerHTML = `
-    <div class="flex items-center gap-4">
-      <img src="${prod.image}" class="w-24 h-24 object-contain rounded-lg bg-gray-50 p-2">
-      <div>
-        <h3 class="font-bold text-base">${prod.name}</h3>
-        <p class="text-sm font-extrabold text-[#f97316] mt-1">${formatMoney(getProductPrice(prod))}</p>
-        <p class="text-xs text-gray-500 mt-1">${prod.specs}</p>
-      </div>
-    </div>
-    <button onclick="addToCart(${prod.id}); closeProductModal();" class="w-full mt-4 bg-[#f97316] text-white py-2 rounded-lg font-bold text-xs">
-      Agregar al Carrito
-    </button>
-  `;
-  document.getElementById('productModal').classList.remove('hidden');
-}
-
 function closeProductModal() {
   document.getElementById('productModal').classList.add('hidden');
 }
@@ -473,10 +478,6 @@ function updateCartBadge() {
   if (badge) badge.innerText = totalCount;
 }
 
-function toggleCartDrawer() {
-  navigateTo('carrito');
-}
-
 function renderCart() {
   const container = document.getElementById('cartItemsList');
   if (!container) return;
@@ -487,7 +488,7 @@ function renderCart() {
         <span class="material-symbols-outlined text-5xl text-gray-300">shopping_bag</span>
         <p class="font-bold text-base">Tu carrito está vacío</p>
         <p class="text-xs">Explorá el catálogo y agregá productos de alta calidad</p>
-        <button onclick="navigateTo('catalogo')" class="mt-2 inline-block bg-[#f97316] text-white text-xs font-bold px-4 py-2 rounded-lg">
+        <button onclick="navigateTo('catalogo')" class="mt-2 inline-block bg-[#f97316] text-white text-xs font-bold px-4 py-2.5 rounded-xl active:scale-95">
           Ir al Catálogo
         </button>
       </div>
@@ -503,22 +504,22 @@ function renderCart() {
     const itemTotal = itemPrice * item.quantity;
 
     return `
-      <div class="py-4 flex items-center justify-between gap-4">
-        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded-lg bg-gray-50 p-2 shrink-0">
+      <div class="py-3.5 flex items-center justify-between gap-3">
+        <img src="${item.image}" alt="${item.name}" class="w-14 h-14 md:w-16 md:h-16 object-contain rounded-lg bg-gray-50 p-2 shrink-0">
         
-        <div class="flex-1 space-y-1">
-          <h4 class="font-bold text-xs md:text-sm leading-tight">${item.name}</h4>
-          <p class="text-xs text-[#f97316] font-extrabold">${formatMoney(itemPrice)} un.</p>
+        <div class="flex-1 space-y-0.5">
+          <h4 class="font-bold text-xs leading-tight line-clamp-2">${item.name}</h4>
+          <p class="text-[11px] text-[#f97316] font-extrabold">${formatMoney(itemPrice)} un.</p>
         </div>
 
-        <div class="flex items-center gap-2 border border-gray-200 dark:border-slate-700 rounded-lg p-1">
-          <button onclick="updateCartQuantity(${item.id}, -1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold">-</button>
-          <span class="text-xs font-bold w-6 text-center">${item.quantity}</span>
-          <button onclick="updateCartQuantity(${item.id}, 1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold">+</button>
+        <div class="flex items-center gap-1.5 border border-gray-200 dark:border-slate-700 rounded-lg p-1">
+          <button onclick="updateCartQuantity(${item.id}, -1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold active:scale-90">-</button>
+          <span class="text-xs font-bold w-5 text-center">${item.quantity}</span>
+          <button onclick="updateCartQuantity(${item.id}, 1)" class="w-6 h-6 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold active:scale-90">+</button>
         </div>
 
         <div class="text-right shrink-0">
-          <p class="font-extrabold text-sm">${formatMoney(itemTotal)}</p>
+          <p class="font-extrabold text-xs md:text-sm">${formatMoney(itemTotal)}</p>
           <button onclick="removeFromCart(${item.id})" class="text-[10px] text-red-500 hover:underline">Eliminar</button>
         </div>
       </div>
@@ -542,22 +543,29 @@ function updateCartTotals(subtotal) {
   const tax = (subtotal - discount) * 0.21;
   const total = (subtotal - discount) + tax;
 
-  document.getElementById('cartSubtotal').innerText = formatMoney(subtotal);
-  document.getElementById('cartTax').innerText = formatMoney(tax);
-  document.getElementById('cartTotal').innerText = formatMoney(total);
+  const elSubtotal = document.getElementById('cartSubtotal');
+  const elTax = document.getElementById('cartTax');
+  const elTotal = document.getElementById('cartTotal');
+
+  if (elSubtotal) elSubtotal.innerText = formatMoney(subtotal);
+  if (elTax) elTax.innerText = formatMoney(tax);
+  if (elTotal) elTotal.innerText = formatMoney(total);
 
   const discountRow = document.getElementById('wholesaleDiscountRow');
   const discountVal = document.getElementById('cartWholesaleDiscount');
   if (discount > 0) {
-    discountRow.classList.remove('hidden');
-    discountVal.innerText = `-${formatMoney(discount)}`;
+    if (discountRow) discountRow.classList.remove('hidden');
+    if (discountVal) discountVal.innerText = `-${formatMoney(discount)}`;
   } else {
-    discountRow.classList.add('hidden');
+    if (discountRow) discountRow.classList.add('hidden');
   }
 }
 
 function applyCoupon() {
-  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const couponInput = document.getElementById('couponInput');
+  if (!couponInput) return;
+
+  const code = couponInput.value.trim().toUpperCase();
   if (code === 'MAYORISTA2026') {
     appState.appliedCoupon = code;
     showToast('¡Descuento del 15% aplicado correctamente!');
@@ -597,7 +605,7 @@ function showToast(message) {
   if (!container) return;
 
   const toast = document.createElement('div');
-  toast.className = "bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-slate-700 transition-all duration-300 transform translate-y-2 opacity-0";
+  toast.className = "bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-slate-700 transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto";
   toast.innerHTML = `<span class="material-symbols-outlined text-[#f97316] text-sm">info</span><span>${message}</span>`;
 
   container.appendChild(toast);
